@@ -34,7 +34,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.ECR_REPOSITORY }}:${{ github.run_number }} /app/.
+          docker build -t ${{ secrets.ECR_REPOSITORY }}:${{ github.run_number }} ./app
 
       - name: AWS Login
         uses: aws-actions/amazon-ecr-login@v2
