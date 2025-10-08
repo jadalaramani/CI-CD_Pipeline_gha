@@ -44,8 +44,10 @@ jobs:
           token: ${{ secrets.MY_GITHUB_TOKEN }}
                   
       - name: Update K8s Deployment YAML
+        env:
+           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
         run: |
-          echo $ECR_REPOSITORY
+          echo $ECR_REPOSITOR
           sed -i "s|REPLACE_IMAGE|$ECR_REPOSITORY:${{ github.run_number }}|g" app/deployment.yaml
           git config user.name "jadalaramani"
           git config user.email "jadalaramani@gmail.com"
