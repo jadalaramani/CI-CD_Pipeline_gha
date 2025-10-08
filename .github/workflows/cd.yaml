@@ -1,0 +1,38 @@
+name: CD - Deploy to EKS
+
+on:
+  workflow_run:
+    workflows: ["CI - Build and Scan NPM"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu.yaml
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
+
+      - name: Update deployment image
+        run: |
+          kubectl set image deployment/npm-app npm-app=${{ secrets.ECR_REPOSITORY }}:${{ github.run_number }} -n default
+          kubectl rollout status deployment/npm-app
+
+      - name: Slack Notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
