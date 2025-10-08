@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
         - name: npm-app
-          image: 141559732042.dkr.ecr.us-east-1.amazonaws.com/npm-app-backend:latest
+          image: :12
           ports:
             - containerPort: 3000
