@@ -2,7 +2,7 @@ name: CD - Deploy to EKS
 
 on:
   workflow_run:
-    workflows: ["CI - Build & Push to ECR"]
+    workflows: [ "CI - Build and Scan" ]
     types:
       - completed
 
@@ -28,7 +28,7 @@ jobs:
 
       - name: Replace image in manifest
         env:
-          ECR_REPO: ${{ secrets.ECR_REPO }}
+          ECR_REPO: ${{ secrets.ECR_REPOSITORY }}
         run: |
           IMAGE_TAG=${{ github.run_number }}
           sed -i "s|REPLACE_IMAGE|$ECR_REPO:$IMAGE_TAG|g" app/deployment.yaml
