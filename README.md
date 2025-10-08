@@ -1,1 +1,27 @@
-# CI-CD_Pipeline_gha-
+# CI-CD_Pipeline_gha
+
+##  Test Locally
+
+```bash
+# Go into app folder
+cd app
+
+# Install dependencies
+npm install
+
+# Start app locally
+npm start
+```
+
+Visit 👉 [http://localhost:3000](http://localhost:3000)
+Output:
+
+```
+🚀 NPM CI/CD Project is running on EKS!
+```
+
+Health check 👉 [http://localhost:3000/health](http://localhost:3000/health)
+
+---
+
+Would you like me to also add a simple **Jest test case** so the CI pipeline can run automated tests before building the image? (Optional but recommended ✅)
