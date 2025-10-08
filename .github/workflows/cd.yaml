@@ -26,12 +26,31 @@ jobs:
         run: |
           aws eks update-kubeconfig --region us-east-1 --name my-cluster
 
-      - name: Replace image in manifest
-        env:
-          ECR_REPO: ${{ secrets.ECR_REPOSITORY }}
+      # - name: Replace image in manifest
+      #   env:
+      #     ECR_REPO: ${{ secrets.ECR_REPOSITORY }}
+      #   run: |
+      #     IMAGE_TAG=${{ github.run_number }}
+      #     sed -i "s|REPLACE_IMAGE|$ECR_REPO:$IMAGE_TAG|g" app/deployment.yaml
+
+            
+      - name: Checkout full history
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.MY_GITHUB_TOKEN }}
+                  
+      - name: Update K8s Deployment YAML
         run: |
-          IMAGE_TAG=${{ github.run_number }}
-          sed -i "s|REPLACE_IMAGE|$ECR_REPO:$IMAGE_TAG|g" app/deployment.yaml
+          sed -i "s|$ECR_REPOSITORY:.*|$ECR_REPOSITORY:${{ github.run_number }}|g" app/deployment.yaml
+          git config user.name "jadalaramani"
+          git config user.email "jadalaramani@gmail.com"
+          git add app/deployment.yaml
+          git commit -m "Update deployment image tag to version ${{ github.run_number }} [skip ci]"
+          git push
 
       - name: Apply Kubernetes Manifests
         run: |
