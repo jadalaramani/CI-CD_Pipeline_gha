@@ -1,21 +1,21 @@
-apiVersion:11
-kind:11
-metadata:11
-  name:11
-  labels:11
-    app:11
-spec:11
-  replicas:11
-  selector:11
-    matchLabels:11
-      app:11
-  template:11
-    metadata:11
-      labels:11
-        app:11
-    spec:11
-      containers:11
-        - name:11
-          image:11
-          ports:11
-            - containerPort:11
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: npm-app
+  labels:
+    app: npm-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: npm-app
+  template:
+    metadata:
+      labels:
+        app: npm-app
+    spec:
+      containers:
+        - name: npm-app
+          image: 141559732042.dkr.ecr.us-east-1.amazonaws.com/npm-app-backend:latest
+          ports:
+            - containerPort: 3000
