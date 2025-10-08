@@ -23,5 +23,3 @@ Output:
 Health check 👉 [http://localhost:3000/health](http://localhost:3000/health)
 
 ---
-
-Would you like me to also add a simple **Jest test case** so the CI pipeline can run automated tests before building the image? (Optional but recommended ✅)
