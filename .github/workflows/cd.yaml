@@ -43,20 +43,25 @@ jobs:
         with:
           token: ${{ secrets.MY_GITHUB_TOKEN }}
                   
-      - name: Update K8s Deployment YAML
+      - name: Update & Deploy to EKS
         env:
-           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
         run: |
-          echo $ECR_REPOSITOR
+          echo "Using ECR Repo: $ECR_REPOSITORY"
           sed -i "s|REPLACE_IMAGE|$ECR_REPOSITORY:${{ github.run_number }}|g" app/deployment.yaml
+      
+          # Deploy the updated manifest
+          kubectl apply -f app/deployment.yaml -n default
+          kubectl apply -f app/service.yaml -n default
+          kubectl rollout status deployment/npm-app -n default
+          
+          # Revert deployment.yaml back to original so repo is clean
+          git checkout -- app/deployment.yaml
+      
+          # Commit only if needed for audit trail (optional)
           git config user.name "jadalaramani"
           git config user.email "jadalaramani@gmail.com"
-          git add app/deployment.yaml
-          git commit -m "Update deployment image tag to version ${{ github.run_number }} [skip ci]"
+          git add .
+          git commit -m "Deployed image version ${{ github.run_number }} [skip ci]" || echo "No changes to commit"
           git push
 
-      - name: Apply Kubernetes Manifests
-        run: |
-          kubectl apply -f app/deployment.yaml -n default          
-           kubectl apply -f app/service.yaml -n default
-          kubectl rollout status deployment/npm-app -n default
