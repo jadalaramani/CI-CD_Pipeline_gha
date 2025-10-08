@@ -2,37 +2,39 @@ name: CD - Deploy to EKS
 
 on:
   workflow_run:
-    workflows: ["CI - Build and Scan"]
+    workflows: ["CI - Build & Push to ECR"]
     types:
       - completed
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Configure AWS
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: ap-south-1
 
       - name: Update kubeconfig
         run: |
-          aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
+          aws eks update-kubeconfig --region ap-south-1 --name my-eks-cluster
 
-      - name: Update deployment image
-        run: |
-          kubectl set image deployment/npm-app npm-app=${{ secrets.ECR_REPOSITORY }}:${{ github.run_number }} -n default
-          kubectl rollout status deployment/npm-app
-
-      - name: Slack Notification
-        uses: 8398a7/action-slack@v3
-        with:
-          status: success
+      - name: Replace image in manifest
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          ECR_REPO: ${{ secrets.ECR_REPO }}
+        run: |
+          IMAGE_TAG=${{ github.run_number }}
+          sed -i "s|REPLACE_IMAGE|$ECR_REPO:$IMAGE_TAG|g" app/deployment.yaml
+
+      - name: Apply Kubernetes Manifests
+        run: |
+          kubectl apply -f app/deployment.yaml -n default          
+           kubectl apply -f app/service.yaml -n default
+          kubectl rollout status deployment/npm-app -n default
