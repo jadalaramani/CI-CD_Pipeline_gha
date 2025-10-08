@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
         - name: npm-app
-          image: REPLACE_IMAGE
+          image: :18
           ports:
             - containerPort: 3000
