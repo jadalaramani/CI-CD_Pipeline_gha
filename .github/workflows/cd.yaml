@@ -45,7 +45,7 @@ jobs:
                   
       - name: Update K8s Deployment YAML
         run: |
-          sed -i "s|$ECR_REPOSITORY:.*|$ECR_REPOSITORY:${{ github.run_number }}|g" app/deployment.yaml
+          sed -i "s|image: .*|image: $ECR_REPOSITORY:${{ github.run_number }}|g" app/deployment.yaml
           git config user.name "jadalaramani"
           git config user.email "jadalaramani@gmail.com"
           git add app/deployment.yaml
