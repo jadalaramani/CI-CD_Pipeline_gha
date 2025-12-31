@@ -9,7 +9,7 @@ on:
   pull_request:
     paths:
       - "terraform/**"
-
+  workflow_dispatch:
 jobs:
   terraform:
     runs-on: ubuntu-latest
