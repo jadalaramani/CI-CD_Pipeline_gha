@@ -1,23 +1,9 @@
-resource "aws_ecr_repository" "npm_app" {
-  name                 = "${var.project_name}-repo"
-  image_tag_mutability = "MUTABLE"
+resource "aws_ecr_repository" "app" {
+  name = "${var.project_name}-ecr"
 
-  lifecycle_policy {
-    policy = jsonencode({
-      rules = [
-        {
-          rulePriority = 1
-          description  = "Expire old images"
-          action       = { type = "expire" }
-          selection    = {
-            tagStatus = "any"
-            countType = "imageCountMoreThan"
-            countNumber = 10
-          }
-        }
-      ]
-    })
+  image_scanning_configuration {
+    scan_on_push = true
   }
+
+  image_tag_mutability = "MUTABLE"
 }
-
-
