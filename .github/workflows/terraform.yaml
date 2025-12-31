@@ -9,10 +9,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Terraform Init
-        run: terraform init
-        working-directory: terraform
+      # - name: Terraform Init
+      #   run: terraform init
+      #   working-directory: terraform
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve
+      - name: Terraform destroy
+        run: terraform destroy -auto-approve
         working-directory: terraform
